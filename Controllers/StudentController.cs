@@ -33,7 +33,7 @@ namespace WebAPI_Pattern_Implementation.Controllers
             {
                 try
                 {
-                    var response = await _httpClient.GetAsync("https://jsonplaceholder.typicode.com/userss");
+                    var response = await _httpClient.GetAsync("https://jsonplaceholder.typicode.com/users");
                     response.EnsureSuccessStatusCode();
                     var students = await response.Content.ReadFromJsonAsync<Student[]>();
                     return Ok(students);
