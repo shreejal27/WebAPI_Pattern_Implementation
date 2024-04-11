@@ -5,9 +5,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 
 //this is used in controller in get call to implement retry pattern
 builder.Services.AddHttpClient();
@@ -17,11 +19,14 @@ builder.Services.AddRateLimiter(options => {
     options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext => RateLimitPartition.GetFixedWindowLimiter(partitionKey: httpContext.User.Identity?.Name ?? httpContext.Request.Headers.Host.ToString(), factory: partition => new FixedWindowRateLimiterOptions
     {
         AutoReplenishment = true,
-        PermitLimit = 5,
+        PermitLimit = 7,
         QueueLimit = 0,
         Window = TimeSpan.FromMinutes(1)
     }));
 });
+
+//this is used to implement throttling 
+
 var app = builder.Build();
 app.UseRateLimiter();
 

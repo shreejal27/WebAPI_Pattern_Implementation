@@ -2,8 +2,8 @@
 
 namespace WebAPI_Pattern_Implementation.Controllers
 {
+    [Route("api/[controller]")]
     [ApiController]
-    [Route("[controller]")]
     public class StudentController : ControllerBase
     {
 
@@ -22,6 +22,8 @@ namespace WebAPI_Pattern_Implementation.Controllers
             _httpClient = httpClient;
         }
 
+        private static int failureCount = 0;
+
         [HttpGet(Name = "GetStudentDetails")]
         public async Task<IActionResult> Get()
         {
@@ -33,10 +35,18 @@ namespace WebAPI_Pattern_Implementation.Controllers
             {
                 try
                 {
+                    if (failureCount < 2)
+                    {
+                        failureCount++;
+                        throw new HttpRequestException("Simulated failure");
+                    }
+                    else
+                    {
                     var response = await _httpClient.GetAsync("https://jsonplaceholder.typicode.com/users");
                     response.EnsureSuccessStatusCode();
                     var students = await response.Content.ReadFromJsonAsync<Student[]>();
                     return Ok(students);
+                    }
                 }
                 catch (HttpRequestException)
                 {
